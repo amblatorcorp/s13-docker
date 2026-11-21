@@ -50,4 +50,14 @@ Use `docker volume rm s13-training-camps-data` only when you intentionally want 
 
 ## CI/CD
 
-`.github/workflows/docker-build.yml` uses a GitHub-hosted `ubuntu-24.04` runner to build the image on every branch push, tagging it with the full commit SHA. This verifies that each pushed commit can produce a Docker image; it does not push the image to a registry or deploy it. No repository variables or secrets are required.
+`.github/workflows/docker-build.yml` uses a GitHub-hosted `ubuntu-24.04` runner to build and push the image to `devopseasylearning/s13-training-camps` on every branch push. Each image is tagged with its full commit SHA; pushes to `develop` also update `latest`.
+
+Before the workflow can publish images:
+
+1. Create the `s13-training-camps` repository under the `devopseasylearning` Docker Hub namespace if it does not already exist.
+2. Create a Docker Hub access token with permission to push images.
+3. In the GitHub repository, add these Actions repository secrets under **Settings → Secrets and variables → Actions**:
+   - `DOCKERHUB_USERNAME`: the Docker Hub account username authorized to push to the namespace
+   - `DOCKERHUB_TOKEN`: the Docker Hub access token
+
+The workflow never stores Docker Hub credentials in the repository.
