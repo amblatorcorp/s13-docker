@@ -12,14 +12,14 @@ The `app` container provides everything:
 - Enrollment API
 - File-based demo persistence through the `app-data` Docker volume
 
-The application uses only the Node.js standard library and has no package dependencies. CI tags the image with the last four characters of the Git commit SHA; local builds use `latest` when `IMAGE_TAG` is not set.
+The application uses only the Node.js standard library and has no package dependencies.
 
 ## Tools used
 
 - HTML5, CSS3, and vanilla JavaScript
 - Node.js 22
 - Docker and Docker Compose
-- Forgejo Actions
+- GitHub Actions
 - Git and curl
 
 ## Run
@@ -50,4 +50,4 @@ Use `docker volume rm s13-training-camps-data` only when you intentionally want 
 
 ## CI/CD
 
-`.github/workflows/deploy-s13-training-camps.yml` builds the single image from the root `Dockerfile`, removes the existing container, starts the replacement with the persistent volume, and verifies its health. No repository variables or secrets are required for this student demo.
+`.github/workflows/docker-build.yml` uses a GitHub-hosted `ubuntu-24.04` runner to build the image on every branch push, tagging it with the full commit SHA. This verifies that each pushed commit can produce a Docker image; it does not push the image to a registry or deploy it. No repository variables or secrets are required.
