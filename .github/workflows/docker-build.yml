@@ -16,7 +16,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Build image
+      - name: Build image from pushed commit
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: docker build --tag "s13-training-camps:${IMAGE_TAG}" .
