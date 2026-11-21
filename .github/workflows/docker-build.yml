@@ -39,3 +39,43 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Start published container and verify health
+        env:
+          IMAGE: devopseasylearning/s13-training-camps:sha-${{ github.sha }}
+          CONTAINER_NAME: s13-training-camps-smoke
+        run: |
+          docker pull "$IMAGE"
+          docker run --detach \
+            --name "$CONTAINER_NAME" \
+            --publish 127.0.0.1:8080:8080 \
+            --health-interval=2s \
+            --health-timeout=3s \
+            --health-retries=5 \
+            "$IMAGE"
+
+          for attempt in $(seq 1 30); do
+            health="$(docker inspect --format '{{.State.Health.Status}}' "$CONTAINER_NAME")"
+            if [ "$health" = "healthy" ]; then
+              docker ps --filter "name=^/${CONTAINER_NAME}$" \
+                --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+              docker inspect --format 'Health: {{.State.Health.Status}}' "$CONTAINER_NAME"
+              curl --fail --silent --show-error http://127.0.0.1:8080/health
+              exit 0
+            fi
+            if [ "$health" = "unhealthy" ]; then
+              docker logs "$CONTAINER_NAME"
+              exit 1
+            fi
+            sleep 2
+          done
+
+          docker logs "$CONTAINER_NAME"
+          exit 1
+
+      - name: Remove smoke-test container
+        if: always()
+        run: |
+          if docker container inspect s13-training-camps-smoke >/dev/null 2>&1; then
+            docker rm --force s13-training-camps-smoke
+          fi

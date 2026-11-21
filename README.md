@@ -50,7 +50,7 @@ Use `docker volume rm s13-training-camps-data` only when you intentionally want 
 
 ## CI/CD
 
-`.github/workflows/docker-build.yml` uses a GitHub-hosted `ubuntu-24.04` runner to build and push the image to `devopseasylearning/s13-training-camps` on every branch push. Each image is tagged with its full commit SHA; pushes to `develop` also update `latest`.
+`.github/workflows/docker-build.yml` uses a GitHub-hosted `ubuntu-24.04` runner to build and push the image to `devopseasylearning/s13-training-camps` on every branch push. Each image is tagged with its full commit SHA; pushes to `develop` also update `latest`. The workflow then starts the published SHA-tagged image, verifies its health endpoint, and shows the container status in the Actions log before removing the temporary container.
 
 Before the workflow can publish images:
 
